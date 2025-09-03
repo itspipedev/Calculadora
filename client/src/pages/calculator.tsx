@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { Calculation, CalculationResponse } from "@shared/schema";
+import { Plus, Minus, X, Divide, Calculator as CalcIcon, Sparkles, Zap, Star } from "lucide-react";
 
 export default function Calculator() {
   const [operandA, setOperandA] = useState<string>("");
@@ -65,6 +66,16 @@ export default function Calculator() {
     });
   };
 
+  const getOperationIcon = (op: string) => {
+    switch (op) {
+      case "sum": return <Plus className="w-5 h-5" />;
+      case "subtract": return <Minus className="w-5 h-5" />;
+      case "multiply": return <X className="w-5 h-5" />;
+      case "divide": return <Divide className="w-5 h-5" />;
+      default: return null;
+    }
+  };
+
   const getOperationSymbol = (op: string) => {
     switch (op) {
       case "sum": return "+";
@@ -86,247 +97,290 @@ export default function Calculator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
+    <div className="min-h-screen relative overflow-hidden py-8 px-4">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 floating-animation"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-gradient-to-r from-yellow-400 to-red-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 floating-animation" style={{animationDelay: "2s"}}></div>
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-72 h-72 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 floating-animation" style={{animationDelay: "4s"}}></div>
+      </div>
+
       {/* Header */}
-      <header className="max-w-4xl mx-auto text-center mb-12">
-        <h1 className="text-4xl font-bold text-foreground mb-4">Calculator App</h1>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          A modern calculator application built with React frontend and Node.js backend. 
-          Perform basic arithmetic operations with a clean, intuitive interface.
+      <header className="max-w-4xl mx-auto text-center mb-12 relative z-10 slide-up">
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 shadow-intense">
+            <CalcIcon className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-5xl font-bold text-gradient">Calculadora</h1>
+          <Sparkles className="w-8 h-8 text-purple-500 animate-pulse" />
+        </div>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Una calculadora súper moderna con efectos visuales dinámicos y una interfaz hermosa
         </p>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+      <main className="max-w-6xl mx-auto relative z-10">
+        <div className="grid lg:grid-cols-3 gap-8 items-start">
           
-          {/* Calculator Card */}
-          <Card className="shadow-lg">
-            <CardContent className="p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-semibold text-card-foreground mb-2">Calculator</h2>
-                <p className="text-muted-foreground">Enter two numbers and select an operation</p>
-              </div>
-
-              {/* Calculator Form */}
-              <form onSubmit={handleCalculate} className="space-y-6">
-                {/* Input A */}
-                <div className="space-y-2">
-                  <Label htmlFor="operand-a">First Number (a)</Label>
-                  <Input
-                    id="operand-a"
-                    type="number"
-                    placeholder="Enter first number"
-                    value={operandA}
-                    onChange={(e) => setOperandA(e.target.value)}
-                    data-testid="input-operand-a"
-                  />
-                </div>
-
-                {/* Operation Select */}
-                <div className="space-y-2">
-                  <Label htmlFor="operation">Operation</Label>
-                  <Select value={operation} onValueChange={setOperation}>
-                    <SelectTrigger data-testid="select-operation">
-                      <SelectValue placeholder="Select operation" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sum">Addition (+)</SelectItem>
-                      <SelectItem value="subtract">Subtraction (-)</SelectItem>
-                      <SelectItem value="multiply">Multiplication (×)</SelectItem>
-                      <SelectItem value="divide">Division (÷)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Input B */}
-                <div className="space-y-2">
-                  <Label htmlFor="operand-b">Second Number (b)</Label>
-                  <Input
-                    id="operand-b"
-                    type="number"
-                    placeholder="Enter second number"
-                    value={operandB}
-                    onChange={(e) => setOperandB(e.target.value)}
-                    data-testid="input-operand-b"
-                  />
-                </div>
-
-                {/* Calculate Button */}
-                <Button 
-                  type="submit"
-                  className="w-full"
-                  disabled={calculationMutation.isPending}
-                  data-testid="button-calculate"
-                >
-                  {calculationMutation.isPending ? "Calculating..." : "Calculate"}
-                </Button>
-              </form>
-
-              {/* Result Display */}
-              <div className="mt-8 p-6 bg-muted rounded-lg border">
-                <h3 className="text-lg font-medium text-card-foreground mb-3">Result</h3>
-                
-                {calculationMutation.isPending && (
-                  <div className="space-y-2">
-                    <div className="animate-pulse">
-                      <div className="h-8 bg-secondary rounded w-1/3 mb-2"></div>
-                      <div className="h-4 bg-secondary rounded w-2/3"></div>
+          {/* Calculator Card - Main Focus */}
+          <div className="lg:col-span-2">
+            <div className="gradient-border shadow-intense scale-in">
+              <div className="gradient-border-inner">
+                <CardContent className="p-10">
+                  <div className="text-center mb-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-blue-100 mb-4">
+                      <Zap className="w-5 h-5 text-purple-600" />
+                      <span className="text-sm font-semibold text-purple-800">Calculadora Dinámica</span>
                     </div>
+                    <h2 className="text-3xl font-bold text-gradient-secondary mb-2">Realiza tus cálculos</h2>
+                    <p className="text-muted-foreground">Ingresa dos números y selecciona una operación</p>
                   </div>
-                )}
 
-                {!calculationMutation.isPending && result !== null && operandA && operandB && operation && (
-                  <div className="space-y-2" data-testid="result-display">
-                    <div className="text-3xl font-bold text-primary">{result}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {operandA} {getOperationSymbol(operation)} {operandB} = {result}
+                  {/* Calculator Form */}
+                  <form onSubmit={handleCalculate} className="space-y-8">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Input A */}
+                      <div className="space-y-3 calc-input">
+                        <Label htmlFor="operand-a" className="text-lg font-semibold flex items-center gap-2">
+                          <Star className="w-4 h-4 text-yellow-500" />
+                          Primer Número (a)
+                        </Label>
+                        <Input
+                          id="operand-a"
+                          type="number"
+                          placeholder="Ingresa el primer número"
+                          value={operandA}
+                          onChange={(e) => setOperandA(e.target.value)}
+                          data-testid="input-operand-a"
+                          className="h-14 text-lg border-2 border-purple-200 focus:border-purple-500 rounded-xl bg-white/50 backdrop-blur-sm"
+                        />
+                      </div>
+
+                      {/* Input B */}
+                      <div className="space-y-3 calc-input">
+                        <Label htmlFor="operand-b" className="text-lg font-semibold flex items-center gap-2">
+                          <Star className="w-4 h-4 text-blue-500" />
+                          Segundo Número (b)
+                        </Label>
+                        <Input
+                          id="operand-b"
+                          type="number"
+                          placeholder="Ingresa el segundo número"
+                          value={operandB}
+                          onChange={(e) => setOperandB(e.target.value)}
+                          data-testid="input-operand-b"
+                          className="h-14 text-lg border-2 border-purple-200 focus:border-purple-500 rounded-xl bg-white/50 backdrop-blur-sm"
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
 
-                {!calculationMutation.isPending && result === null && (
-                  <div className="text-muted-foreground" data-testid="result-empty">
-                    Enter numbers and select an operation to see the result
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    {/* Operation Select */}
+                    <div className="space-y-3">
+                      <Label htmlFor="operation" className="text-lg font-semibold flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-purple-500" />
+                        Operación
+                      </Label>
+                      <Select value={operation} onValueChange={setOperation}>
+                        <SelectTrigger data-testid="select-operation" className="h-14 text-lg border-2 border-purple-200 focus:border-purple-500 rounded-xl bg-white/50 backdrop-blur-sm">
+                          <SelectValue placeholder="Selecciona una operación" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-2">
+                          <SelectItem value="sum" className="text-lg py-3">
+                            <div className="flex items-center gap-3">
+                              <Plus className="w-5 h-5 text-green-500" />
+                              <span>Suma (+)</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="subtract" className="text-lg py-3">
+                            <div className="flex items-center gap-3">
+                              <Minus className="w-5 h-5 text-red-500" />
+                              <span>Resta (-)</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="multiply" className="text-lg py-3">
+                            <div className="flex items-center gap-3">
+                              <X className="w-5 h-5 text-blue-500" />
+                              <span>Multiplicación (×)</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="divide" className="text-lg py-3">
+                            <div className="flex items-center gap-3">
+                              <Divide className="w-5 h-5 text-purple-500" />
+                              <span>División (÷)</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-          {/* Info Panel */}
-          <div className="space-y-6">
-            {/* API Documentation */}
-            <Card className="shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-card-foreground mb-4">API Documentation</h3>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium text-card-foreground mb-2">Endpoint</h4>
-                    <code className="bg-muted px-3 py-1 rounded text-sm">POST /api/calculate</code>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium text-card-foreground mb-2">Request Body</h4>
-                    <pre className="bg-muted p-3 rounded text-sm overflow-x-auto"><code>{`{
-  "operation": "sum",
-  "a": 5,
-  "b": 3
-}`}</code></pre>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium text-card-foreground mb-2">Response</h4>
-                    <pre className="bg-muted p-3 rounded text-sm overflow-x-auto"><code>{`{
-  "result": 8
-}`}</code></pre>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Supported Operations */}
-            <Card className="shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-card-foreground mb-4">Supported Operations</h3>
-                <div className="space-y-3">
-                  {[
-                    { name: "Addition", code: "sum" },
-                    { name: "Subtraction", code: "subtract" },
-                    { name: "Multiplication", code: "multiply" },
-                    { name: "Division", code: "divide" },
-                  ].map((op, index, array) => (
-                    <div 
-                      key={op.code}
-                      className={`flex items-center justify-between py-2 ${
-                        index < array.length - 1 ? 'border-b border-border' : ''
-                      }`}
+                    {/* Calculate Button */}
+                    <Button 
+                      type="submit"
+                      disabled={calculationMutation.isPending}
+                      data-testid="button-calculate"
+                      className="w-full h-16 text-xl font-bold rounded-xl calc-button pulse-glow"
+                      style={{
+                        background: 'var(--gradient-primary)',
+                        border: 'none'
+                      }}
                     >
-                      <span className="font-medium">{op.name}</span>
-                      <code className="bg-muted px-2 py-1 rounded text-sm">{op.code}</code>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                      {calculationMutation.isPending ? (
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Calculando...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <Zap className="w-6 h-6" />
+                          Calcular
+                        </div>
+                      )}
+                    </Button>
+                  </form>
 
-            {/* Features */}
-            <Card className="shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-card-foreground mb-4">Features</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  {[
-                    "REST API with Express.js backend",
-                    "React frontend with hooks",
-                    "Input validation and error handling",
-                    "Responsive design",
-                    "Modern UI with Tailwind CSS",
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-center">
-                      <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+                  {/* Result Display */}
+                  <div className="mt-10 p-8 rounded-2xl glass-effect border-2 border-purple-200/50">
+                    <h3 className="text-2xl font-bold text-gradient mb-6 flex items-center gap-2">
+                      <Star className="w-6 h-6 text-yellow-500" />
+                      Resultado
+                    </h3>
+                    
+                    {calculationMutation.isPending && (
+                      <div className="space-y-4">
+                        <div className="animate-pulse space-y-3">
+                          <div className="h-12 bg-gradient-to-r from-purple-200 to-blue-200 rounded-xl w-1/2"></div>
+                          <div className="h-6 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg w-3/4"></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!calculationMutation.isPending && result !== null && operandA && operandB && operation && (
+                      <div className="space-y-4 result-appear" data-testid="result-display">
+                        <div className="text-6xl font-bold text-gradient-secondary mb-2">{result}</div>
+                        <div className="text-xl text-muted-foreground flex items-center gap-2">
+                          <span className="font-semibold">{operandA}</span>
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                            {getOperationIcon(operation)}
+                          </span>
+                          <span className="font-semibold">{operandB}</span>
+                          <span className="text-purple-500 font-bold">=</span>
+                          <span className="font-bold text-gradient">{result}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {!calculationMutation.isPending && result === null && (
+                      <div className="text-center py-8" data-testid="result-empty">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-purple-100 to-blue-100 flex items-center justify-center">
+                          <CalcIcon className="w-8 h-8 text-purple-500" />
+                        </div>
+                        <p className="text-lg text-muted-foreground">
+                          Ingresa los números y selecciona una operación para ver el resultado
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </div>
+            </div>
+          </div>
+
+          {/* Info Panel - Sidebar */}
+          <div className="space-y-6 slide-up" style={{animationDelay: "0.3s"}}>
+            {/* Operaciones Rápidas */}
+            <div className="gradient-border shadow-intense">
+              <div className="gradient-border-inner">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-gradient mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-500" />
+                    Operaciones
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      { name: "Suma", code: "sum", icon: Plus, color: "text-green-500", bg: "from-green-100 to-emerald-100" },
+                      { name: "Resta", code: "subtract", icon: Minus, color: "text-red-500", bg: "from-red-100 to-pink-100" },
+                      { name: "Multiplicación", code: "multiply", icon: X, color: "text-blue-500", bg: "from-blue-100 to-cyan-100" },
+                      { name: "División", code: "divide", icon: Divide, color: "text-purple-500", bg: "from-purple-100 to-indigo-100" },
+                    ].map((op, index) => (
+                      <div 
+                        key={op.code}
+                        className={`flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r ${op.bg} hover:scale-105 transition-transform cursor-pointer`}
+                        onClick={() => setOperation(op.code)}
+                      >
+                        <div className={`w-8 h-8 rounded-lg bg-white flex items-center justify-center ${op.color}`}>
+                          <op.icon className="w-4 h-4" />
+                        </div>
+                        <span className="font-semibold text-gray-700">{op.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </div>
+            </div>
+
+            {/* Características */}
+            <div className="gradient-border shadow-intense">
+              <div className="gradient-border-inner">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-gradient mb-4 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-yellow-500" />
+                    Características
+                  </h3>
+                  <ul className="space-y-3">
+                    {[
+                      "Interfaz súper moderna",
+                      "Animaciones dinámicas",
+                      "Efectos visuales únicos",
+                      "Gradientes hermosos",
+                      "Completamente responsiva"
+                    ].map((feature, index) => (
+                      <li key={feature} className="flex items-center gap-3 text-sm">
+                        <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></div>
+                        <span className="text-muted-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </div>
+            </div>
+
+            {/* API Info */}
+            <div className="gradient-border shadow-intense">
+              <div className="gradient-border-inner">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-gradient mb-4 flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-blue-500" />
+                    API Info
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50">
+                      <p className="font-semibold text-blue-800 mb-1">Endpoint</p>
+                      <code className="text-blue-600">POST /api/calculate</code>
+                    </div>
+                    <div className="p-3 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50">
+                      <p className="font-semibold text-green-800 mb-1">Tecnologías</p>
+                      <p className="text-green-600">React + Node.js + Express</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Technical Specs */}
-        <Card className="mt-12 shadow-lg">
-          <CardContent className="p-8">
-            <h3 className="text-2xl font-semibold text-card-foreground mb-6">Technical Implementation</h3>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Backend Implementation */}
-              <div>
-                <h4 className="text-lg font-medium text-card-foreground mb-4">Backend (Node.js + Express)</h4>
-                <div className="space-y-3 text-sm">
-                  {[
-                    { title: "Server Setup", desc: "Express server running on port 5000" },
-                    { title: "API Endpoint", desc: "POST /calculate with JSON body validation" },
-                    { title: "Error Handling", desc: "Division by zero and input validation" },
-                    { title: "CORS", desc: "Cross-origin requests enabled for frontend" },
-                  ].map((item) => (
-                    <div key={item.title} className="bg-muted p-3 rounded">
-                      <div className="font-medium mb-1">{item.title}</div>
-                      <div className="text-muted-foreground">{item.desc}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Frontend Implementation */}
-              <div>
-                <h4 className="text-lg font-medium text-card-foreground mb-4">Frontend (React)</h4>
-                <div className="space-y-3 text-sm">
-                  {[
-                    { title: "Components", desc: "Functional components with hooks" },
-                    { title: "State Management", desc: "useState for form data and results" },
-                    { title: "API Communication", desc: "Fetch API for backend requests" },
-                    { title: "UI Framework", desc: "Tailwind CSS for styling" },
-                  ].map((item) => (
-                    <div key={item.title} className="bg-muted p-3 rounded">
-                      <div className="font-medium mb-1">{item.title}</div>
-                      <div className="text-muted-foreground">{item.desc}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-
-      {/* Footer */}
-      <footer className="max-w-4xl mx-auto mt-12 text-center">
-        <div className="border-t border-border pt-8">
-          <p className="text-muted-foreground">
-            Calculator App - Built with React + Node.js + Express
+        {/* Decorative Footer */}
+        <div className="mt-16 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-100 to-blue-100 backdrop-blur-sm">
+            <CalcIcon className="w-5 h-5 text-purple-600" />
+            <span className="text-purple-800 font-semibold">Calculadora Súper Dinámica</span>
+            <Sparkles className="w-5 h-5 text-purple-600" />
+          </div>
+          <p className="text-muted-foreground mt-4">
+            Construida con ❤️ usando las tecnologías más modernas
           </p>
         </div>
-      </footer>
+      </main>
     </div>
   );
 }
