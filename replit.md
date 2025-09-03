@@ -1,8 +1,52 @@
-# Calculator App
+# Calculadora Avanzada - Aplicación Full-Stack
 
-## Overview
+## Descripción General
 
-This is a full-stack web calculator application built with modern technologies. The frontend provides a clean, responsive calculator interface using React and shadcn/ui components, while the backend offers a REST API for mathematical operations. The application features input validation, error handling, and a professional UI design with toast notifications for user feedback.
+Esta es una aplicación de calculadora web full-stack profesional construida con tecnologías modernas. Incluye una calculadora básica y científica avanzada con múltiples funcionalidades profesionales.
+
+## Funcionalidades Principales
+
+### Calculadora Básica
+- Operaciones aritméticas fundamentales (suma, resta, multiplicación, división)
+- Interfaz neomórfica moderna y responsive
+- Validación de entrada en tiempo real
+- Manejo profesional de errores
+- Formato automático de números grandes y pequeños
+
+### Calculadora Científica
+- **Operaciones Exponenciales**: Potencia (x^y), raíz cuadrada, raíz cúbica
+- **Logaritmos**: Logaritmo natural (ln), logaritmo base 10, logaritmo personalizado
+- **Trigonometría**: sin, cos, tan, arcsin, arccos, arctan con soporte DEG/RAD
+- **Funciones Hiperbólicas**: sinh, cosh, tanh
+- **Constantes Matemáticas**: π (pi), e (euler), φ (golden ratio), τ (tau)
+- **Operaciones Especiales**: factorial, valor absoluto, redondeo, módulo, porcentaje
+
+### Sistema de Memoria
+- **MS (Memory Store)**: Guardar valor actual en memoria
+- **MR (Memory Recall)**: Recuperar valor de memoria
+- **M+ (Memory Add)**: Sumar al valor en memoria
+- **M- (Memory Subtract)**: Restar del valor en memoria
+- **MC (Memory Clear)**: Limpiar memoria
+- Indicador visual del estado de memoria
+
+### Historial de Cálculos
+- Registro automático de todas las operaciones realizadas
+- Persistencia en localStorage del navegador
+- Interfaz visual con scroll para revisar operaciones pasadas
+- Click en entradas del historial para reutilizar resultados
+- Límite de 100 entradas para optimizar rendimiento
+
+### Exportación de Datos
+- **Formato CSV**: Para análisis en Excel/Sheets
+- **Formato JSON**: Para integración con otras aplicaciones
+- Descarga automática de archivos con timestamps
+
+### Interfaz de Usuario Avanzada
+- **Modo Dual**: Alternancia entre calculadora básica y científica
+- **Tema Neomórfico**: Diseño moderno con sombras y profundidad
+- **Responsive**: Optimizado para móviles, tablets y escritorio
+- **Animaciones**: Efectos visuales suaves y profesionales
+- **Notificaciones Toast**: Feedback inmediato para el usuario
 
 ## User Preferences
 

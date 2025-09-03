@@ -118,6 +118,7 @@
     border-radius: 2rem;
     box-shadow: var(--shadow-neo-outset);
     padding: 2rem;
+    transition: all 0.3s ease;
   }
   
   .calc-display {
@@ -129,6 +130,8 @@
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
+    transition: all 0.2s ease;
+    overflow: hidden;
   }
   
   .calc-button {
@@ -138,7 +141,7 @@
     width: 80px;
     height: 80px;
     box-shadow: var(--shadow-neo-outset);
-    transition: all 0.15s ease;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--calc-text-light);
     font-size: 1.5rem;
     font-weight: 400;
@@ -147,16 +150,37 @@
     align-items: center;
     justify-content: center;
     user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .calc-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
   }
   
   .calc-button:hover {
     box-shadow: var(--shadow-neo-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  .calc-button:hover::before {
+    width: 100%;
+    height: 100%;
   }
   
   .calc-button:active {
     box-shadow: var(--shadow-neo-pressed);
-    transform: translateY(1px);
+    transform: translateY(1px) scale(0.98);
+    animation: buttonPress 0.1s ease;
   }
   
   .calc-button.function {
@@ -173,6 +197,19 @@
   .calc-button.operator.active {
     background: var(--calc-text-light);
     color: var(--calc-operator);
+    animation: pulse 1s infinite;
+  }
+  
+  .calc-button.scientific {
+    background: linear-gradient(145deg, hsl(260, 50%, 35%), hsl(260, 50%, 25%));
+    color: var(--calc-text-light);
+    font-size: 1.1rem;
+  }
+  
+  .calc-button.memory {
+    background: linear-gradient(145deg, hsl(200, 50%, 35%), hsl(200, 50%, 25%));
+    color: var(--calc-text-light);
+    font-size: 1.1rem;
   }
   
   .calc-button.zero {
@@ -319,24 +356,152 @@
   }
 }
 
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: var(--shadow-neo-outset);
+  }
+  50% {
+    box-shadow: var(--shadow-neo-outset), 0 0 20px var(--calc-operator);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -10px, 0);
+  }
+  70% {
+    transform: translate3d(0, -5px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
 /* Responsive Utilities */
-@media (max-width: 640px) {
+@media (max-width: 1200px) {
+  .calc-container {
+    max-width: 450px;
+  }
+}
+
+@media (max-width: 768px) {
   .calc-button {
-    width: 70px;
-    height: 70px;
+    width: 75px;
+    height: 75px;
     font-size: 1.25rem;
   }
   
   .calc-button.zero {
-    width: 150px;
+    width: 160px;
   }
   
   .calc-container {
-    padding: 1.5rem;
+    padding: 1.75rem;
+    max-width: 400px;
   }
   
   .calc-display {
-    padding: 1.5rem;
-    min-height: 100px;
+    padding: 1.75rem;
+    min-height: 110px;
+  }
+  
+  .calc-display .text-4xl {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .calc-button {
+    width: 65px;
+    height: 65px;
+    font-size: 1.1rem;
+  }
+  
+  .calc-button.scientific,
+  .calc-button.memory {
+    font-size: 0.9rem;
+  }
+  
+  .calc-button.zero {
+    width: 140px;
+  }
+  
+  .calc-container {
+    padding: 1.25rem;
+    border-radius: 1.5rem;
+  }
+  
+  .calc-display {
+    padding: 1.25rem;
+    min-height: 90px;
+    border-radius: 1rem;
+  }
+  
+  .calc-display .text-4xl {
+    font-size: 2rem;
+  }
+  
+  .calc-grid {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calc-button {
+    width: 60px;
+    height: 60px;
+    font-size: 1rem;
+  }
+  
+  .calc-button.scientific,
+  .calc-button.memory {
+    font-size: 0.8rem;
+  }
+  
+  .calc-button.zero {
+    width: 130px;
+    padding-left: 1.5rem;
+  }
+  
+  .calc-container {
+    padding: 1rem;
+  }
+  
+  .calc-display {
+    padding: 1rem;
+    min-height: 80px;
+  }
+  
+  .calc-display .text-4xl {
+    font-size: 1.75rem;
+  }
+  
+  .calc-grid {
+    gap: 0.5rem;
   }
 }
